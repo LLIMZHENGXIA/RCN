@@ -227,19 +227,20 @@ if 'comparison_results' not in st.session_state:
     st.session_state.comparison_results = pd.DataFrame()
 
 # Comparison Section
-st.header("Comparison Section")
-raw_column = st.selectbox("Select column from Raw_data to compare", Raw_data.columns.tolist())
-sigma_column = st.selectbox("Select column from Sigma_data to compare", Sigma_data.columns.tolist())
+if not Raw_data.empty and not Sigma_data.empty:
+    st.header("Comparison Section")
+    raw_column = st.selectbox("Select column from Raw_data to compare", Raw_data.columns.tolist())
+    sigma_column = st.selectbox("Select column from Sigma_data to compare", Sigma_data.columns.tolist())
 
-if st.button("Compare"):
-    if raw_column and sigma_column:
-        comparison_results = compare_columns(Raw_data, Sigma_data, raw_column, sigma_column)
+    if st.button("Compare"):
+        if raw_column and sigma_column:
+            comparison_results = compare_columns(Raw_data, Sigma_data, raw_column, sigma_column)
 
-        # Concatenate and reset column names to avoid duplicate column names error
-        st.session_state.comparison_results = pd.concat([st.session_state.comparison_results, comparison_results],
-                                                        axis=1)
-        st.session_state.comparison_results.columns = [f"{col}_{i}" for i, col in
-                                                       enumerate(st.session_state.comparison_results.columns)]
+            # Concatenate and reset column names to avoid duplicate column names error
+            st.session_state.comparison_results = pd.concat([st.session_state.comparison_results, comparison_results],
+                                                            axis=1)
+            st.session_state.comparison_results.columns = [f"{col}_{i}" for i, col in
+                                                           enumerate(st.session_state.comparison_results.columns)]
 
 # Display and save the comparison results
 if not st.session_state.comparison_results.empty:
