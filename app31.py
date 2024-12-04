@@ -109,6 +109,8 @@ st.sidebar.header("Raw Data")
 directory = st.sidebar.text_input("Enter the directory path")
 search_keywords = st.sidebar.text_input("Enter keywords to search for files separated by commas").split(',')
 
+Raw_data = pd.DataFrame()  # Initialize Raw_data as an empty DataFrame
+
 if directory and search_keywords:
     with st.spinner('Searching for files...'):
         start_time = time.time()  # Record the start time
@@ -218,8 +220,7 @@ if lot_id and metric_tool_id and wafer_scribe and mfg_process_step and wafer_spe
         filtered_Sigma_data = filter_data(Sigma_data, keywords)
     else:
         filtered_Sigma_data = Sigma_data
-
-st.dataframe(filtered_Sigma_data)
+        st.dataframe(filtered_Sigma_data)
 
 # Initialize or load the comparison results
 if 'comparison_results' not in st.session_state:
@@ -227,19 +228,18 @@ if 'comparison_results' not in st.session_state:
 
 # Comparison Section
 st.header("Comparison Section")
-if not Raw_data.empty and not Sigma_data.empty:
-    raw_column = st.selectbox("Select column from Raw_data to compare", Raw_data.columns.tolist())
-    sigma_column = st.selectbox("Select column from Sigma_data to compare", Sigma_data.columns.tolist())
+raw_column = st.selectbox("Select column from Raw_data to compare", Raw_data.columns.tolist())
+sigma_column = st.selectbox("Select column from Sigma_data to compare", Sigma_data.columns.tolist())
 
-    if st.button("Compare"):
-        if raw_column and sigma_column:
-            comparison_results = compare_columns(Raw_data, Sigma_data, raw_column, sigma_column)
+if st.button("Compare"):
+    if raw_column and sigma_column:
+        comparison_results = compare_columns(Raw_data, Sigma_data, raw_column, sigma_column)
 
-            # Concatenate and reset column names to avoid duplicate column names error
-            st.session_state.comparison_results = pd.concat([st.session_state.comparison_results, comparison_results],
-                                                            axis=1)
-            st.session_state.comparison_results.columns = [f"{col}_{i}" for i, col in
-                                                           enumerate(st.session_state.comparison_results.columns)]
+        # Concatenate and reset column names to avoid duplicate column names error
+        st.session_state.comparison_results = pd.concat([st.session_state.comparison_results, comparison_results],
+                                                        axis=1)
+        st.session_state.comparison_results.columns = [f"{col}_{i}" for i, col in
+                                                       enumerate(st.session_state.comparison_results.columns)]
 
 # Display and save the comparison results
 if not st.session_state.comparison_results.empty:
